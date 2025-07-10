@@ -12,6 +12,7 @@ const pawn = `<div class="piece" id="pawn"><svg xmlns="http://www.w3.org/2000/sv
 */
 
 //this is the board as I see it build from or around it
+//These are the 64 pieces and empty spaces seen on every chess board 
 const startPieces = [
 '♜','♞','♝','♛','♚','♝','♞','♜',
 '♟','♟','♟','♟','♟','♟','♟','♟',
