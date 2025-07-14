@@ -63,8 +63,8 @@ function setupDragHandlers(){
 //=============================When dragging starts listen
 
 function handleDragStart(e){
-    const toRow = parseInt(square.dataset.row);
-    const toCol = parseInt(square.dataset.col);
+    const row = parseInt(e.target.dataset.row);
+    const col = parseInt(e.target.dataset.col);
     const piece = boardState[row][col];
     //==========================currentPlayers piece
     //drag only your own piece
@@ -76,24 +76,30 @@ function handleDragStart(e){
     draggedPiece = piece;// save piece
     dragFrom = [row, col]; //save staring position
 
+    if(getPieceColor(piece) !== currentPlayer){
+    e.preventDefault();
+    infoDisplay.innerText = `It's ${currentPlayer}'s turn.`
+    return;
+}
+
 }
 
 //=======================dropped piece
-function handleDrop(event){
-    const toRow = parseInt(e.currentTarget.dataset.row);
-    const toCol = parseInt(e.currentTarget.dataset.col);
+function handleDrop(e){
+    const row = parseInt(e.target.dataset.row);
+    const col = parseInt(e.target.dataset.col);
     const [fromRow, fromCol] = dragFrom;
-    boardState[toRow][toCol] = draggedPiece; //move piece
+    boardState[row][col] = draggedPiece; //move piece
     boardState[fromRow][fromCol] = ''; //clear old spot
     //check moves
-    if(isMoveLegal(fromRow, fromCol, toRow, toCol)){
-        boardState[toRow][toCol] = draggedPiece; //move piece
+    if(isMoveLegal(fromRow, fromCol, row, col)){
+        boardState[row][col] = draggedPiece; //move piece
         boardState[fromRow][fromCol] = ''; //clear old spot
         //rewarding the pawn for making it across the board upgrade to a queen
-        if(draggedPiece === '♙' && toRow === 0)//if this white pawn reaches the top row it will be replaced with a white queen
-            boardState[toRow][toCol] = '♕';
-        if(draggedPiece === '♟' && toRow === 7)//if this black pawn reaches the bottom row it will be replaced with a black queen
-            boardState[toRow][toCol] = '♛';
+        if(draggedPiece === '♙' && row === 0)//if this white pawn reaches the top row it will be replaced with a white queen
+            boardState[row][col] = '♕';
+        if(draggedPiece === '♟' && row === 7)//if this black pawn reaches the bottom row it will be replaced with a black queen
+            boardState[row][col] = '♛';
 
         createBoard(); //updates the board with queen info
 
@@ -102,7 +108,7 @@ function handleDrop(event){
         playerDisplay.innerText = currentPlayer;//displays whose turn it is next
         infoDisplay.innerText = ''; //clears out old messages
     }else{
-        infoDisplay.innerText = "Frivolous Move, Are You Nervous!";
+        infoDisplay.innerText = "Illegal Move!";
     }
 
     draggedPiece = null; //reset dragged piece and it's previous position
@@ -124,4 +130,29 @@ resetBtn.addEventListener('click', () => {//when the reset button is clicked , i
 
 })
 //===================SPOILS OF WAR
+function getPieceColor(piece){
+if('♙♖♘♗♕♔'.includes(piece)) return "White";//White Pieces 
+if('♟♜♞♝♛♚'.includes(piece)) return "Black";//Black Pieces 
+return null; //empty square 
+}
+
+
+//===========================Legal Moves
+function isMoveLegal(fromRow, fromCol, row, col){
+const piece = boardState[fromRow][fromCol];
+const target = boardState[row][col];
+
+const sameColor = getPieceColor(piece) === getPieceColor(target);
+if(sameColor) return false; //can not take  your own piece law
+
+const rowDiff = row - fromRow;
+const colDiff = col - fromCol
+
+
+switch (piece){
+    case '♙': //White pawn
+    if(row === 6 && rowDiff === -2 && colDiff === 0 && target === '' && boardState[5][fromCol] === '') return true
+}
+
+}
 

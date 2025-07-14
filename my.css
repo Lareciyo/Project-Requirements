@@ -23,12 +23,12 @@ border: 12px inset gold;
     font-size: 32px;
 }
 .white{
-    background-color: #eeeeee;
-    color:black;
+    background-color: #f40909;
+    color:goldenrod;
     }
     .black{
-        background-color: #444444;
-        color: white;
+        background-color: #0f0101;
+        color: rgb(167, 95, 95);
     }
     .piece{
         cursor: grab
