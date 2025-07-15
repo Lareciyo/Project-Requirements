@@ -1,158 +1,211 @@
-//These queryies grab parts of the page so it can be changed and or updated later 
-const board = document.querySelector('#gameboard');//where I've the drawn the board
-const playerDisplay = document.querySelector('#player'); //shows whose turn it will be
-const infoDisplay = document.querySelector('#info-display');//shows the messages
-const resetBtn = document.querySelector('#reset-btn'); //button to reset game
 
-let selectedSquare = null;  //nothing is selected at the start
-let currentPlayer = 'White'; //White always start first in chess
-let boardState = []; 
-let draggedPiece = null;//should keep track of the pieces being dragged
-let dragFrom = null;
-//8 rows and 8 columns should be enough
-//=====================SETTING THE BOARD===============================
-function initBoardState(){
-    boardState = [];
-    for(let row = 0; row < 8; row++){
-        boardState[row]=[];
-        for(let col = 0; col < 8; col++){
-            boardState[row][col] = startPieces[row * 8 + col];
-        }
-    }
-    console.log('Board state initialized:', boardState)
-}
-//This is the board creation 
-function createBoard(){
-    board.innerHTML = '';
-    for(let row = 0; row < 8; row++){
-        for(let col = 0; col < 8; col++){
-            const square = document.createElement('div');
-            square.classList.add('square');
-            square.classList.add((row + col) % 2 === 0 ? 'white' : 'black');
-            square.dataset.row = row;
-            square.dataset.col = col;
+const gameBoard = document.querySelector("#gameboard"); //Grab the board
+const playerDisplay = document.querySelector("#player"); //Show whose turn it is
+const infoDisplay = document.querySelector("#info-display"); //show win or error messages
 
-            const piece = boardState[row][col];
-            if(piece !== ''){
-                const pieceDiv = document.createElement('div');//create the piece
-                pieceDiv.innerText = piece; // shows the chess symbol
-                pieceDiv.classList.add('piece');  //styles the piece
-                pieceDiv.setAttribute('draggable', true); //makes it draggable
-                pieceDiv.dataset.row = row;  //remember's where it's from 
-                pieceDiv.dataset.col = col; //remember's where it's from 
-                square.appendChild(pieceDiv) //places the piece on the square
-            }
-            board.appendChild(square)  //adds the square to the board
-        }
-    }
-    console.log('Board created with current boardState.')
-    setupDragHandlers();//lets the piece resp to dragging
+const width = 8; //chess board_ 8 squares wide
+let playerGo = "white";
+playerDisplay.textContent = playerGo;
+
+const startPieces = [
+  rook,
+  knight,
+  bishop,
+  queen,
+  king,
+  bishop,
+  knight,
+  rook,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  pawn,
+  rook,
+  knight,
+  bishop,
+  queen,
+  king,
+  bishop,
+  knight,
+  rook,
+];
+
+function createBoard() {
+  startPieces.forEach((startPiece, i) => {
+    const square = document.createElement("div");
+    square.classList.add("square");
+    square.innerHTML = startPiece;
+
+    square.firstChild?.setAttribute("draggable", true);
+
+    square.setAttribute("square-id", i);
+
+   const row = Math.floor((63 - i) / 8) + 1;
+   square.classList.add(row % 2 === 0 ? (i % 2 === 0 ? "beige" : "brown") : (i % 2 === 0 ? "brown" : "beige"));
+
+   if(i <= 15) square.firstChild?.firstChild?.classList.add("black");
+    if(i >= 48) square.firstChild?.firstChild?.classList.add("white");
+   
+    gameBoard.append(square);
+  });
 }
-//===========================DRAGGABLES====================================
-//this is the creation of the drag events
-function setupDragHandlers(){
-    const pieces = document.querySelectorAll(".piece");
-    pieces.forEach(piece => piece.addEventListener('dragstart', handleDragStart));
-    console.log(`Drag handlers set up for ${pieces.length} pieces.`)
-    const squares = document.querySelectorAll('.square');
-    squares.forEach(square => {
-        square.addEventListener('dragover', e => e.preventDefault());
-        square.addEventListener('drop', handleDrop)
+createBoard();
+
+let startPositionId, draggedElement;
+
+document.querySelectorAll(".square").forEach(square => {
+square.addEventListener("dragstart", dragStart);
+square.addEventListener("dragover", e => e.preventDefault());
+  square.addEventListener("drop", dragDrop);
+})
+
+
+function dragDrop(e){
+    const correctGo = draggedElement.firstChild.classList.contains(playerGo);
+     e.stopPropagation();
+   const taken = e.target.classList.contains("piece");
+  const valid = checkIfValid(e.target);
+  const opponent = playerGo === "white" ? "black" : "white";
+  const takenByOpponent = e.target.firstChild?.classList.contains(opponent);
+  if(!correctGo) return;
+  if(takenByOpponent && valid){
+e.target.parentNode.append(draggedElement);
+      e.target.remove();
+      checkForWin();
+      changePlayer();
+      return;
+  }
+
+
+  if(taken && !takenByOpponent){
+ infoDisplay.textContent = "Frivolous Move, Stop Disrespecting My Game!";
+      setTimeout(() => (infoDisplay.textContent = ""), 1500);
+      return;
+  }
+  if(valid){
+    e.target.app(draggedElement);
+    checkForWin();
+    changePlayer();
+  }
+}
+
+
+function checkIfValid(target) {
+  const targetId =
+    Number(target.getAttribute("square-id")) ||
+    Number(target.parentNode.getAttribute("square-id"));
+  const startId = Number(startPositionId);
+  const piece = draggedElement.id;
+  console.log("targetId", targetId);
+  console.log("startId", startId);
+  console.log("piece", piece);
+
+  if(piece === "pawn") {
+    const startRow = [48, 49, 50, 51, 52, 53, 54, 55]; //white pawns
+    if(
+        (startRow.includes(startId) && startId - width * 2 === targetId) || 
+        startId - width == target || 
+        (startId - width - 1 === target && document.querySelector(`[square-id ='${startId - width - 1}']`)?.firstChild) ||
+        (startId - width + 1 === target && document.querySelector(`[square-id ='${startId - width + 1}']`)?.firstChild)
+    ) return true;
+  }
+
+  if(piece === "knight"){
+    const moves = [17, 15, 10, 6, -17, -15, -10, -6];
+    return moves.includes(targetId - startId)
+  }
+  if(piece === "bishop") return targetId === startId + width + 1;
+  if(piece === "queen") return targetId === startId + width + 1;
+  if(piece === "king") {
+    const diff = targetId - startId;
+    return [1, -1, width, -width, width - 1, width + 1, -width + 1].includes(diff)
+  }
+}
+
+function changePlayer() {
+  if (playerGo === "black") {
+    reverseIds();
+    playerGo = "white";
+  }else{
+    revertIds();
+    playerGo = "black";}
+    playerDisplay.textContent = "playerGo";
+  }
+
+
+function reverseIds() {
+  const allSquares = document.querySelectorAll(".square").forEach((sq, i) =>
+    sq.setAttribute("square-id", width * width - 1 - i)
+  );
+  
+}
+
+function revertIds() {
+  document.querySelectorAll(".square").forEach((sq, i) => sq.setAttribute("square-id", i));
+}
+
+
+
+function checkForWin(){
+    const kings = Array.from(document.querySelectorAll("#king"));
+    const whiteAlive = kings.some(k => k.firstChild?.classList.contains("white"));
+    const blackAlive = kings.some(k => k.firstChild?.classList.contains("black"))
+    if(!whiteAlive){
+        infoDisplay.textContent = "Black Wins!";
+        disableDragging();
+    }
+
+    if(!blackAlive){
+        infoDisplay.textContent = "White Wins!";
+        disableDragging();
+    }
+}
+function disableDragging(){
+    document.querySelectorAll(".square").forEach(sq => {
+        sq.firstChild?.setAttribute("draggable", false)
     })
 }
-//=============================When dragging starts listen
-
-function handleDragStart(e){
-    const row = parseInt(e.target.dataset.row);
-    const col = parseInt(e.target.dataset.col);
-    const piece = boardState[row][col];
-    //==========================currentPlayers piece
-    //drag only your own piece
-    if(getPieceColor(piece)!== currentPlayer){
-        e.preventDefault();
-        infoDisplay.innerText = `It's ${currentPlayer}'s turn.`;
-        return;
-    }
-    draggedPiece = piece;// save piece
-    dragFrom = [row, col]; //save staring position
-
-    if(getPieceColor(piece) !== currentPlayer){
-    e.preventDefault();
-    infoDisplay.innerText = `It's ${currentPlayer}'s turn.`
-    return;
-}
-
-}
-
-//=======================dropped piece
-function handleDrop(e){
-    const row = parseInt(e.target.dataset.row);
-    const col = parseInt(e.target.dataset.col);
-    const [fromRow, fromCol] = dragFrom;
-    boardState[row][col] = draggedPiece; //move piece
-    boardState[fromRow][fromCol] = ''; //clear old spot
-    //check moves
-    if(isMoveLegal(fromRow, fromCol, row, col)){
-        boardState[row][col] = draggedPiece; //move piece
-        boardState[fromRow][fromCol] = ''; //clear old spot
-        //rewarding the pawn for making it across the board upgrade to a queen
-        if(draggedPiece === '♙' && row === 0)//if this white pawn reaches the top row it will be replaced with a white queen
-            boardState[row][col] = '♕';
-        if(draggedPiece === '♟' && row === 7)//if this black pawn reaches the bottom row it will be replaced with a black queen
-            boardState[row][col] = '♛';
-
-        createBoard(); //updates the board with queen info
-
-        //switch to the other player
-        currentPlayer = currentPlayer === "White" ? "Black" : "White";//if currentPlayer is white, it becomes black
-        playerDisplay.innerText = currentPlayer;//displays whose turn it is next
-        infoDisplay.innerText = ''; //clears out old messages
-    }else{
-        infoDisplay.innerText = "Illegal Move!";
-    }
-
-    draggedPiece = null; //reset dragged piece and it's previous position
-    dragFrom = null; //resets the drag-and-drop-logic so the board should be ready for the next turn.
-}
-
-//======================RESET BUTTON LOGIC
-
-resetBtn.addEventListener('click', () => {//when the reset button is clicked , it clears the board and starts a new game
-    selectedSquare = null;//clear out the square the player clicked on
-    draggedPiece = null;
-    dragFrom = null;//clear out the square memory
-    currentPlayer = 'White';//the game always starts with white
-    playerDisplay.innerText = currentPlayer;//updates the player display box, keeps the user informed
-    infoDisplay.innerText = '';//clears out any old messages
-
-    initBoardState();//loading a fresh chessboard
-    createBoard();//the function redraws the board on the screen
-
-})
-//===================SPOILS OF WAR
-function getPieceColor(piece){
-if('♙♖♘♗♕♔'.includes(piece)) return "White";//White Pieces 
-if('♟♜♞♝♛♚'.includes(piece)) return "Black";//Black Pieces 
-return null; //empty square 
-}
-
-
-//===========================Legal Moves
-function isMoveLegal(fromRow, fromCol, row, col){
-const piece = boardState[fromRow][fromCol];
-const target = boardState[row][col];
-
-const sameColor = getPieceColor(piece) === getPieceColor(target);
-if(sameColor) return false; //can not take  your own piece law
-
-const rowDiff = row - fromRow;
-const colDiff = col - fromCol
-
-
-switch (piece){
-    case '♙': //White pawn
-    if(row === 6 && rowDiff === -2 && colDiff === 0 && target === '' && boardState[5][fromCol] === '') return true
-}
-
-}
-

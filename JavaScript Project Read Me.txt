@@ -1,0 +1,14 @@
+JavaScript Project
+
+Chess Game Application
+		This is a chess Game built using **HTML, CSS, and JavaScript**. It uses drag, and drop to move pieces and includes basic game rules like turn switching, legal move checks, and pawn upgrading: to a 'Queen'
+		
+What this game can do:
+
+Displays a 8x8 chess board
+Drag and drop chess pieces.
+Enforces turn order "White always starts the game then Black"
+This game only allows the "Legal moves" that are coded into the JavaScript.
+InnerText shows whose turn it is to move.
+Displays an "Illegal move" message if a move is "Not" allow.
+
