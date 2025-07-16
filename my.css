@@ -4,6 +4,10 @@ body{
   align-items: center;
   min-height: 100vh;
   margin:0;
+  background-position: center;
+  background-image: url('./image/bluesmoke.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 #gameboard {
