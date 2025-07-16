@@ -1,48 +1,29 @@
-*{
-    box-sizing: border-box;
+body{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin:0;
 }
-
-html, body{
-    padding: 0;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    font-size: 115%;
-    color:white;
-    background-image: url('./image/bluesmoke.png');
-    background-size: cover;
-    background-position: center;
-    margin:0;
-}
-
-
-
-
 
 #gameboard {
-  width: 90vmin;
-  height: 90vmin;
-  /* color of the background of chess board */
-  display: flex;
+  width: 377.6px;
+  height: 377.6px;
+   display: flex;
   flex-wrap: wrap;
   background-color: rgb(157, 157, 149);
-  border: inset 8px goldenrod;
-  max-width: 90vw;
-  /* max-height: 90vw; */
-  aspect-ratio: 1 / 1;
+  margin:40px auto;
+  position: relative;
 }
-
 .square {
-  height:12.5%;
-  width: 12.5%;
+  height: 47.2px;
+  width: 47.2px;
   position: relative;
 }
 .square svg {
-  height: 75%;
-  width: 75%;
-  margin: 12.5%;
+  height: 35.4px;
+  width: 35.4px;
+  margin: 5.9px;
   position: relative;
   z-index: -9;
 }
@@ -59,11 +40,11 @@ path {
 
 
 .beige {
-  background-color: rgb(110, 110, 98);
+  background-color: rgb(122, 105, 102);
 }
 
 .brown {
-  background-color: rgb(169, 43, 43);
+  background-color: rgb(156, 25, 25);
 }
 .black {
   fill: black;
@@ -71,16 +52,29 @@ path {
 .white {
   fill: rgb(255, 255, 255);
 }
-#player, #info-display{
-    font-size: 1.2em;
-    margin:10px;
-    text-align: center;
+#game-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+#game-info{
+  margin-top: 20px;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 45px;
+  color: goldenrod;
+}
+#game-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-@media(max-width: 600px){
-#gameboard{
-    width:95vw;
-    height:95vw
+#game-container{
+  transform: scale(1.15);
+transform-origin: top center;
 }
-}
+
 
