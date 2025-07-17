@@ -7,8 +7,12 @@ What this game can do:
 
 Displays a 8x8 chess board
 Drag and drop chess pieces.
-Enforces turn order "White always starts the game then Black"
+Enforces turn order "Black always starts the game then White"
+A reset button has been added to restart any game.
 This game only allows the "Legal moves" that are coded into the JavaScript.
 InnerText shows whose turn it is to move.
 Displays an "Illegal move" message if a move is "Not" allow.
+The King, Queen, Bishop, Knight, Rook and Pawn all have movement validation has to how and where to move.
+And the moves are capturing, so a piece can be taken off the board.
+No pawn upgrade just a serious game of chess.
 
